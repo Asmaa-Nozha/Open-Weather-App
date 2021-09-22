@@ -57,6 +57,6 @@ This file deals with the server side data.
 
 ## Author:
 
-This project was made by **Asmaa Nozha** for the **Professional track of web
+This project was made by **Asmaa Nozha** for the **Professional track** of web
 development with [udacity](https://classroom.udacity.com/).
 
