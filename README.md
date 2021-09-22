@@ -30,14 +30,14 @@ submet button.
 
 ## Technologies
 
-+The app uses `API` credentials on [openweathermap](https://openweathermap.org/) 
++ The app uses `API` credentials on [openweathermap](https://openweathermap.org/) 
 
-+The app uses `node.js` to manipulate the server side data.
++ The app uses `node.js` to manipulate the server side data.
 
-+The app responses to the user input data **zip code** and
++ The app responses to the user input data **zip code** and
 **user feelings** using `javascript` file.
 
-+`css3` styles to create the UI styles. 
++ `css3` styles to create the UI styles. 
 
 ## Content:
 
