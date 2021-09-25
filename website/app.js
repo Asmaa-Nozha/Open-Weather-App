@@ -1,13 +1,6 @@
 /* Global Variables */
- //input variables
-let inputZIP = document.getElementById('zip');
-let txtarea__feeling = document.getElementById('feelings');
-let btn__generate = document.getElementById('generate');
- //output variables
-let div__temp = document.getElementById('temp');
-let div__date = document.getElementById('date');
-let div__content = document.getElementById('content');
 
+let btn__generate = document.getElementById('generate');
 
 /**
  * @description set inputs empty while refreshing && create error msg dialog
@@ -35,20 +28,21 @@ window.addEventListener('load',function(){
 function setButton__generate(){
     document.getElementById('generate').addEventListener("click", () => {
 
-   
+      const inputZIP = document.getElementById('zip').value;
+      const  txtarea__feeling = document.getElementById('feelings').value;
   //check zip code value
-    if(inputZIP.value == ""  ){
+    if(inputZIP == ""  ){
         document.getElementById('msg__error').style.display='block';
         document.getElementById('msg__error').innerHTML="ZIP code can not be empty. Please add your ZIP code.";
     }
     //check feelings dialog value
-    else if(txtarea__feeling.value == "" ){
+    else if(txtarea__feeling == "" ){
         document.getElementById('msg__error').style.display='block';
         document.getElementById('msg__error').innerHTML=" Please add your feelings first.";
     }
     //set the weather data 
     else{
-       performAction();
+       performAction(inputZIP,txtarea__feeling);
     }
 
     });
@@ -61,41 +55,108 @@ let apiKey = '&appid=2ae7e6880e41afe51e609dc19b17d0e0';
 
 // Create a new date instance dynamically with JS
 let datenow = new Date();
-let newDate = datenow.getMonth() + '.' + datenow.getDate() + '.' + datenow.getFullYear();
+let newDate = datenow.getMonth() + 1 + '.' + datenow.getDate() + '.' + datenow.getFullYear();
  
 /**
- * @description get the api key 
+ * @description get the api data , post data to the server
  * */
-function performAction(e){
-getWeather (baseURL , inputZIP.value , apiKey);
+function performAction(zip,feelings){
+ 
+getWeather (baseURL , zip, apiKey)
+.then((data) =>{
+  postData('/addWeather',{temp:data.main.temp,date:newDate,feelings:feelings})
+})
+.then(() =>{
+updateUI()
+});
+
+;
 
 }
 /**
- * @description fetch the api url json data , update the UI 
+ * @description fetch the api url json data 
  * */
 const getWeather = async (baseURL, zipcode, key)=>{
 
   const res = await fetch (baseURL + zipcode + key)
   try {
     const data = await res.json();
-    console.log(data);
     if(data.cod == '404')
     {
         document.getElementById('msg__error').style.display='block';
         document.getElementById('msg__error').innerHTML=`Invalid zip code value. Please resubmit.`;
+        document.getElementById('zip').value ="";
+        document.getElementById('feelings').value="";
+        document.getElementById('temp').innerHTML = "";
+        document.getElementById('date').innerHTML = "";
+       document.getElementById('content').innerHTML = "";
     }
-    else{
-      div__temp.innerHTML=`<strong> The current temprature: </strong>${data.main.temp}°`;
-      div__date.innerHTML=`<strong> The current date: </strong>${newDate}`;
-      div__content.innerHTML=`<strong> Your are feeling: </strong>${txtarea__feeling.value}`;
-    }
+    console.log( 'api data' , data);
     return data;
   }  catch(error) {
-     
-   document.getElementById('msg__error').style.display='block';
-   document.getElementById('msg__error').innerHTML=`${error.value}. Please resubmit.`;
+    console.log('error',error);
+  }
+}
+/**
+ * @description Async post the data to the server function 
+ * */
+
+const postData = async ( url = '', data = {})=>{
+
+  const response = await fetch(url, {
+  method: 'POST', 
+  credentials: 'same-origin', 
+  headers: {
+      'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),       
+});
+
+  try {
+    const newData = await response.json();
+    return newData;
+  }catch(error) {
+  console.log("error", error);
+  }
+};
+
+// Async GET
+const retrieveData = async (url='') =>{ 
+const request = await fetch(url);
+try {
+// Transform into JSON
+const allData = await request.json()
+}
+catch(error) {
+  console.log("error", error);
+  
+}
+};
+
+// Chain  async functions to post  data then GET the resulting data
+const updateUI = async () => {
+  const request = await fetch('/all');
+  try{
+    const allData = await request.json();
+    //const length = allData.length;
+    console.log('length', allData);
+    document.getElementById('temp').innerHTML =    `The temprature is:    <strong> ${allData[0].temp}° </strong>  ` ;
+    document.getElementById('date').innerHTML =    `The current date is:  <strong> ${allData[0].date}   </strong>  `   ;
+    document.getElementById('content').innerHTML = `Your feelings are :   <strong> ${allData[0].feelings} </strong>  ` ;
+
+  }catch(error){
+    console.log("error", error);
   }
 }
 
 
+/*
+handling errors:
+1. in case of wrong zip === 404 error 
+2. in case of empty zip code or feelings text area
 
+but the server still add the same zip data to the server every time  I add it //should we fix that??
+
+
+
+*/
