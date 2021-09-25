@@ -1,6 +1,6 @@
 /* Empty JS object to act as endpoint for all routes */
 projectData = {};
-
+const addData =[];
 /* Express to run server and routes */
 const express = require('express');
 
@@ -26,24 +26,29 @@ const server = app.listen(port, listening);
   };
 
 // GET route
-app.get('/all', sendData);
 
-function sendData (request, response) {
-  response.send(projectData)
+
+
+app.get('/all', getData);
+
+function getData (request, response) {
+
+  console.log(addData);
+  response.send(addData);
 };
 
-// POST route
-app.post('/add', callBack);
+// POST 
 
-function callBack(req,res){
-  res.send('POST received')
+app.post('/addWeather', addWeather);
+
+function addWeather (req,res){
+  projectData={
+    temp: req.body.temp,
+    date:req.body.date,
+    feelings:req.body.feelings
+  }
+    addData.unshift(projectData);
+    console.log('newdata', projectData);
+    console.log('weather data', addData)
 };
 
-// POST a temp
-const data = [];
-
-app.post('/zipcode', addZipCode);
-
-function addZipCode (req,res){
-    data.push(req.body);
-};
